@@ -18,14 +18,14 @@ def generate_model(prompt):
     # Этап 1: Генерация 2D-изображения с помощью DeepFloyd
     try:
         print("Loading DeepFloyd model...")
-        pipe = (DiffusionPipeline.from_pretrained(
-            "DeepFloyd/IF-I-XL-v1.0",
-            variant="fp16",
-            torch_dtype=torch.float16,
-            safety_checker=None
-            )
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        torch_dtype = torch.float16 if device == "cuda" else torch.float32
+        pipe = DiffusionPipeline.from_pretrained(
+            "DeepFloyd/IF-I-XL-v1.0", 
+            variant="fp16" if device == "cuda" else None,  # Убираем variant для CPU
+            torch_dtype=torch_dtype
         )
-        pipe = pipe.to("cuda" if torch.cuda.is_available() else "cpu")
+        pipe = pipe.to(device)
 
         # Генерация изображения
         print(f"Generating image for prompt: {prompt}")
