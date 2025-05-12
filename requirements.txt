@@ -1,0 +1,7 @@
+Django
+django-cors-headers
+djangorestframework
+djangorestframework-simplejwt
+torch
+diffusers
+huggingface_hub
