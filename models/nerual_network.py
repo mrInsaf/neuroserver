@@ -5,33 +5,39 @@ import torch
 from huggingface_hub import login
 
 
+# 🚀 Загрузка модели один раз при старте приложения
+device = "cuda" if torch.cuda.is_available() else "cpu"
+torch_dtype = torch.float16 if device == "cuda" else torch.float32
+
+# Загрузка PixArt-Sigma (легковесная альтернатива DeepFloyd)
+pipe = DiffusionPipeline.from_pretrained(
+    "PixArt-alpha/PixArt-Sigma-XL-2-1024-MS",
+    torch_dtype=torch_dtype,
+    use_safetensors=True
+)
+
+# 💡 Включаем xFormers для снижения потребления памяти
+try:
+    pipe.enable_xformers_memory_efficient_attention()
+except ModuleNotFoundError:
+    print("xFormers не установлен. Рекомендуется установить: pip install xformers")
+
+# 📦 Переносим модель на устройство (GPU/CPU)
+pipe = pipe.to(device)
+
+# 📁 Настройка путей
+current_dir = os.path.dirname(__file__)
+stable_fast_3d_dir = os.path.abspath(os.path.join(current_dir, '..', '..', 'stable-fast-3d'))
+demo_files_dir = os.path.join(stable_fast_3d_dir, 'demo_files', 'examples')
+output_dir = os.path.join(demo_files_dir, 'output')
+input_image_path = os.path.join(demo_files_dir, 'generated_image.jpg')
+
 def generate_model(prompt):
-    login(token="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")
-
-    # Настройка путей
-    current_dir = os.path.dirname(__file__)  # Папка, где расположен этот скрипт
-    stable_fast_3d_dir = os.path.abspath(os.path.join(current_dir, '..', '..', 'stable-fast-3d'))
-    demo_files_dir = os.path.join(stable_fast_3d_dir, 'demo_files', 'examples')
-    output_dir = os.path.join(demo_files_dir, 'output')
-    input_image_path = os.path.join(demo_files_dir, 'generated_image.jpg')
-
-    # Этап 1: Генерация 2D-изображения с помощью DeepFloyd
     try:
-        print("Loading DeepFloyd model...")
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        torch_dtype = torch.float16 if device == "cuda" else torch.float32
-        pipe = DiffusionPipeline.from_pretrained(
-            "DeepFloyd/IF-I-XL-v1.0", 
-            variant="fp16" if device == "cuda" else None,  # Убираем variant для CPU
-            torch_dtype=torch_dtype
-        )
-        pipe = pipe.to(device)
-
-        # Генерация изображения
         print(f"Generating image for prompt: {prompt}")
-        image = pipe(prompt).images[0]
+        image = pipe(prompt, height=1024, width=1024).images[0]
 
-        # Сохранение изображения в папку demo_files/examples
+        # 📁 Сохраняем изображение
         os.makedirs(demo_files_dir, exist_ok=True)
         image.save(input_image_path)
         print(f"Image saved to {input_image_path}")
