@@ -34,35 +34,6 @@ demo_files_dir = os.path.join(stable_fast_3d_dir, 'demo_files', 'examples')
 output_dir = os.path.join(demo_files_dir, 'output')
 input_image_path = os.path.join(demo_files_dir, 'generated_image.jpg')
 
-# ТЕСТ ТЕСТ ТЕСТ
-
-print("Загружаю модель генерации 3д моделей")
-# Путь к скрипту run.py
-script_path = os.path.join(stable_fast_3d_dir, 'run.py')
-
-# Настройка параметров команды
-pretrained_model = 'stabilityai/stable-fast-3d'
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-texture_resolution = 512
-batch_size = 1
-
-# Команда для запуска Stable Fast 3D
-command = [
-    'python', script_path,
-    '--device', device,
-    '--pretrained-model', pretrained_model,
-    '--output-dir', output_dir,
-    '--texture-resolution', str(texture_resolution),
-    '--batch_size', str(batch_size),
-    input_image_path
-]
-print("Загрузил модель генерации 3д моделей")
-
-print(f"Running Stable Fast 3D with command: {' '.join(command)}")
-result = subprocess.run(command, capture_output=True, text=True)
-
-# ТЕСТ ТЕСТ ТЕСТ
-
 def generate_model(prompt):
     try:
         correct_prompt = f"{prompt} on white background"
