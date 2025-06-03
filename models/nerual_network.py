@@ -34,8 +34,9 @@ input_image_path = os.path.join(demo_files_dir, 'generated_image.jpg')
 
 def generate_model(prompt):
     try:
-        print(f"Generating image for prompt: {prompt}")
-        image = pipe(prompt, height=1024, width=1024).images[0]
+        correct_prompt = f"{prompt} on white background"
+        print(f"Generating image for prompt: {correct_prompt}")
+        image = pipe(correct_prompt, height=1024, width=1024).images[0]
 
         # 📁 Сохраняем изображение
         os.makedirs(demo_files_dir, exist_ok=True)
