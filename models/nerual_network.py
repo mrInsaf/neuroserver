@@ -1,8 +1,12 @@
 import os
 import subprocess
 import torch
+from huggingface_hub import login
 
 from utils.kandinsky import FusionBrainAPI
+
+login(token="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")
+
 
 # 📁 Настройка путей
 current_dir = os.path.dirname(__file__)
