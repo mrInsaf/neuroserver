@@ -1,31 +1,8 @@
 import os
 import subprocess
-from diffusers import DiffusionPipeline
 import torch
-from huggingface_hub import login
 
-
-login(token="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")
-
-# 🚀 Загрузка модели один раз при старте приложения
-device = "cuda" if torch.cuda.is_available() else "cpu"
-torch_dtype = torch.float16 if device == "cuda" else torch.float32
-
-# Загрузка PixArt-Sigma (легковесная альтернатива DeepFloyd)
-pipe = DiffusionPipeline.from_pretrained(
-    "PixArt-alpha/PixArt-Sigma-XL-2-1024-MS",
-    torch_dtype=torch_dtype,
-    use_safetensors=True
-)
-
-# 💡 Включаем xFormers для снижения потребления памяти
-try:
-    pipe.enable_xformers_memory_efficient_attention()
-except ModuleNotFoundError:
-    print("xFormers не установлен. Рекомендуется установить: pip install xformers")
-
-# 📦 Переносим модель на устройство (GPU/CPU)
-pipe = pipe.to(device)
+from utils.kandinsky import FusionBrainAPI
 
 # 📁 Настройка путей
 current_dir = os.path.dirname(__file__)
@@ -35,14 +12,19 @@ output_dir = os.path.join(demo_files_dir, 'output')
 input_image_path = os.path.join(demo_files_dir, 'generated_image.jpg')
 
 def generate_model(prompt):
+    # Этап 1 генерация изображения
     try:
         correct_prompt = f"{prompt} on white background"
         print(f"Generating image for prompt: {correct_prompt}")
-        image = pipe(correct_prompt, height=1024, width=1024).images[0]
 
-        # 📁 Сохраняем изображение
+        api = FusionBrainAPI('https://api-key.fusionbrain.ai/', 'D0681623CF84256B48952B6167A13C72',
+                             'CEEC564CF61B94990B929FBC9753B969')
+        pipeline_id = api.get_pipeline()
+        uuid = api.generate("gnome on white background", pipeline_id)
+
         os.makedirs(demo_files_dir, exist_ok=True)
-        image.save(input_image_path)
+
+        api.check_generation(uuid, input_image_path)
         print(f"Image saved to {input_image_path}")
     except Exception as e:
         return f"Error during image generation: {str(e)}"
