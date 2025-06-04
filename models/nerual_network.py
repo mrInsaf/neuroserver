@@ -8,7 +8,7 @@ from huggingface_hub import login
 login(token="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")
 
 # 🚀 Загрузка модели один раз при старте приложения
-device = "cuda" if torch.cuda.is_available() else "cpu"
+device = "cuda:0" if torch.cuda.is_available() else "cpu"
 torch_dtype = torch.float16 if device == "cuda" else torch.float32
 
 # Загрузка PixArt-Sigma (легковесная альтернатива DeepFloyd)
@@ -54,7 +54,7 @@ def generate_model(prompt):
 
         # Настройка параметров команды
         pretrained_model = 'stabilityai/stable-fast-3d'
-        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        device = 'cuda:1' if torch.cuda.is_available() else 'cpu'
         texture_resolution = 512
         batch_size = 1
 
