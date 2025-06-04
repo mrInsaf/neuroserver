@@ -24,7 +24,7 @@ def generate_model(prompt):
         api = FusionBrainAPI('https://api-key.fusionbrain.ai/', 'D0681623CF84256B48952B6167A13C72',
                              'CEEC564CF61B94990B929FBC9753B969')
         pipeline_id = api.get_pipeline()
-        uuid = api.generate("gnome on white background", pipeline_id)
+        uuid = api.generate(correct_prompt, pipeline_id)
 
         os.makedirs(demo_files_dir, exist_ok=True)
 
@@ -41,7 +41,7 @@ def generate_model(prompt):
         # Настройка параметров команды
         pretrained_model = 'stabilityai/stable-fast-3d'
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        texture_resolution = 512
+        texture_resolution = 256
         batch_size = 1
 
         # Команда для запуска Stable Fast 3D
