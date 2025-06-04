@@ -41,7 +41,7 @@ def generate_model(prompt):
         # Настройка параметров команды
         pretrained_model = 'stabilityai/stable-fast-3d'
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        texture_resolution = 256
+        texture_resolution = 512
         batch_size = 1
 
         # Команда для запуска Stable Fast 3D
