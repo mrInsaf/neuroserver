@@ -1,6 +1,7 @@
 import os
 import subprocess
 import torch
+from django.http import FileResponse
 from huggingface_hub import login
 
 from utils.kandinsky import FusionBrainAPI
@@ -60,7 +61,17 @@ def generate_model(prompt):
 
         if result.returncode == 0:
             print("3D model generation successful!")
-            return f"3D model generated successfully! Output saved to {output_dir}"
+
+            # Поиск файла .glb в output_dir
+            glb_files = [f for f in os.listdir(output_dir) if f.endswith('.glb')]
+            if not glb_files:
+                return "Error: Generated .glb file not found in output directory"
+
+            glb_filename = glb_files[0]
+            file_path = os.path.join(output_dir, glb_filename)
+
+            # Возврат файла для скачивания
+            return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=glb_filename)
         else:
             return f"Error during 3D model generation: {result.stderr}"
     except Exception as e:
